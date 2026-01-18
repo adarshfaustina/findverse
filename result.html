@@ -1,15 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Result Page</title>
+  <title>Result</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #43cea2, #185a9d);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      width: 350px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    #output {
+      margin-top: 15px;
+      font-size: 18px;
+      color: #444;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #43cea2;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #36b18a;
+    }
+  </style>
 </head>
 <body>
 
-  <h2>Result</h2>
-  <div id="output">Searching...</div>
+  <div class="card">
+    <h2>Result</h2>
+    <div id="output">Searching...</div>
+    <button onclick="goBack()">Go Back</button>
+  </div>
 
   <script>
-    const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTdFlL3VMGn8pXoo0e3b6uePy_gpRJX7jBFoRcksf_fKVcLFj9a79TUh7wy7Kv8ZrYc2h4b3T_gXaLl/pub?output=csv";
+    const sheetURL = "YOUR_CSV_LINK_HERE";
 
     const params = new URLSearchParams(window.location.search);
     const userQuery = params.get("query");
@@ -28,7 +76,7 @@
 
           if (key === userQuery) {
             document.getElementById("output").innerHTML =
-              `<h3>Result: ${result}</h3>`;
+              `<strong>${result}</strong>`;
             found = true;
             break;
           }
@@ -38,9 +86,13 @@
           document.getElementById("output").innerText = "No matching record found.";
         }
       })
-      .catch(err => {
+      .catch(() => {
         document.getElementById("output").innerText = "Error loading data.";
       });
+
+    function goBack() {
+      window.location.href = "index.html";
+    }
   </script>
 
 </body>
