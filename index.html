@@ -4,20 +4,23 @@
   <title>Main Page</title>
 </head>
 <body>
-  <h2>Enter ID</h2>
 
-  <input type="text" id="userInput" placeholder="Enter ID">
+  <h2>Enter Value</h2>
+  <input type="text" id="userInput" placeholder="Enter something">
   <button onclick="goToResult()">Search</button>
 
   <script>
     function goToResult() {
-      const value = document.getElementById("userInput").value;
+      const value = document.getElementById("userInput").value.trim();
+
       if (!value) {
-        alert("Please enter ID");
+        alert("Please enter a value");
         return;
       }
-      window.location.href = "result.html?id=" + value;
+
+      window.location.href = "result.html?query=" + encodeURIComponent(value);
     }
   </script>
+
 </body>
 </html>
