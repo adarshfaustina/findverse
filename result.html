@@ -4,36 +4,44 @@
   <title>Result Page</title>
 </head>
 <body>
+
   <h2>Result</h2>
-  <div id="output">Loading...</div>
+  <div id="output">Searching...</div>
 
   <script>
-    const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTdFlL3VMGn8pXoo0e3b6uePy_gpRJX7jBFoRcksf_fKVcLFj9a79TUh7wy7Kv8ZrYc2h4b3T_gXaLl/pub?output=csv";
+    const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTdFlL3VMGn8pXoo0e3b6uePy_gpRJX7jBFoRcksf_fKVcLFj9a79TUh7wy7Kv8ZrYc2h4b3T_gXaLl/pub?output=csv";
 
     const params = new URLSearchParams(window.location.search);
-    const searchId = params.get("id");
+    const userQuery = params.get("query");
 
-    fetch(url)
-      .then(response => response.text())
-      .then(data => {
-        const rows = data.split("\n");
+    fetch(sheetURL)
+      .then(res => res.text())
+      .then(csv => {
+        const rows = csv.split("\n");
         let found = false;
 
         for (let i = 1; i < rows.length; i++) {
           const cols = rows[i].split(",");
 
-          if (cols[0] === searchId) {
-            document.getElementById("output").innerHTML = 
-              `<p>Name: ${cols[1]}</p><p>Marks: ${cols[2]}</p>`;
+          const key = cols[0]?.trim();
+          const result = cols[1]?.trim();
+
+          if (key === userQuery) {
+            document.getElementById("output").innerHTML =
+              `<h3>Result: ${result}</h3>`;
             found = true;
             break;
           }
         }
 
         if (!found) {
-          document.getElementById("output").innerText = "No record found.";
+          document.getElementById("output").innerText = "No matching record found.";
         }
+      })
+      .catch(err => {
+        document.getElementById("output").innerText = "Error loading data.";
       });
   </script>
+
 </body>
 </html>
