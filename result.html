@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Result</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+    }
+    table {
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #333;
+      padding: 8px 12px;
+    }
+    th {
+      background: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Search Result</h2>
+<div id="output">Loading...</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const query = params.get("query");
+
+  const fileUrl = "https://drive.google.com/uc?export=download&id=YOUR_FILE_ID";
+  const searchColumn = "ID"; // EXACT column header name
+
+  fetch(fileUrl)
+    .then(res => res.arrayBuffer())
+    .then(data => {
+      const workbook = XLSX.read(data, { type: "array" });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet);
+
+      const result = rows.find(row => String(row[searchColumn]) === query);
+
+      if (!result) {
+        document.getElementById("output").innerHTML = "<p>No result found.</p>";
+        return;
+      }
+
+      let html = "<table><tr>";
+      Object.keys(result).forEach(key => {
+        html += `<th>${key}</th>`;
+      });
+      html += "</tr><tr>";
+      Object.values(result).forEach(val => {
+        html += `<td>${val}</td>`;
+      });
+      html += "</tr></table>";
+
+      document.getElementById("output").innerHTML = html;
+    })
+    .catch(err => {
+      document.getElementById("output").innerHTML = "Error loading Excel file.";
+      console.error(err);
+    });
+</script>
+
+</body>
+</html>
