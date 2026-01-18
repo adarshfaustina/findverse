@@ -1,71 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Result</title>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 40px;
-    }
-    table {
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      border: 1px solid #333;
-      padding: 8px 12px;
-    }
-    th {
-      background: #f2f2f2;
-    }
-  </style>
+  <title>Result Page</title>
 </head>
 <body>
+  <h2>Result</h2>
+  <div id="output">Loading...</div>
 
-<h2>Search Result</h2>
-<div id="output">Loading...</div>
+  <script>
+    const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTdFlL3VMGn8pXoo0e3b6uePy_gpRJX7jBFoRcksf_fKVcLFj9a79TUh7wy7Kv8ZrYc2h4b3T_gXaLl/pub?output=csv";
 
-<script>
-  const params = new URLSearchParams(window.location.search);
-  const query = params.get("query");
+    const params = new URLSearchParams(window.location.search);
+    const searchId = params.get("id");
 
-  const fileUrl = "https://drive.google.com/uc?export=download&id=1NJ3WXz3wrmxfWc9n49J7Tc-pW7Op_D8maLkcjUV55iE";
-  const searchColumn = "ACCOUNT"; // EXACT column header name
+    fetch(url)
+      .then(response => response.text())
+      .then(data => {
+        const rows = data.split("\n");
+        let found = false;
 
-  fetch(fileUrl)
-    .then(res => res.arrayBuffer())
-    .then(data => {
-      const workbook = XLSX.read(data, { type: "array" });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(sheet);
+        for (let i = 1; i < rows.length; i++) {
+          const cols = rows[i].split(",");
 
-      const result = rows.find(row => String(row[searchColumn]) === query);
+          if (cols[0] === searchId) {
+            document.getElementById("output").innerHTML = 
+              `<p>Name: ${cols[1]}</p><p>Marks: ${cols[2]}</p>`;
+            found = true;
+            break;
+          }
+        }
 
-      if (!result) {
-        document.getElementById("output").innerHTML = "<p>No result found.</p>";
-        return;
-      }
-
-      let html = "<table><tr>";
-      Object.keys(result).forEach(key => {
-        html += `<th>${key}</th>`;
+        if (!found) {
+          document.getElementById("output").innerText = "No record found.";
+        }
       });
-      html += "</tr><tr>";
-      Object.values(result).forEach(val => {
-        html += `<td>${val}</td>`;
-      });
-      html += "</tr></table>";
-
-      document.getElementById("output").innerHTML = html;
-    })
-    .catch(err => {
-      document.getElementById("output").innerHTML = "Error loading Excel file.";
-      console.error(err);
-    });
-</script>
-
+  </script>
 </body>
 </html>
-
